@@ -4,19 +4,22 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/chirag-3/crud-api-in-memory/internals/routes"
+	"github.com/chirag-3/crud-api-in-memory/internals/store"
 	"github.com/gorilla/mux"
 )
 
+var r *mux.Router
+
 func main() {
 	fmt.Println("Hello world")
-	r := mux.NewRouter()
-	r.HandleFunc("/", standardFunc).Methods("POST")
-	err := http.ListenAndServe(":8081", r)
-	if err != nil {
-		fmt.Println("Not able to start server", err)
-	}
-}
+	r = mux.NewRouter()
 
-func standardFunc(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is a standard path")
+	store.InitializeStore()
+	routes.RegisterRoutes(r)
+
+	if err := http.ListenAndServe(":8090", r); err != nil {
+		fmt.Println("Server not started", err)
+	}
+
 }
